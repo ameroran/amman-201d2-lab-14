@@ -1,4 +1,3 @@
-/* global Cart */
 'use strict';
 
 // Create an event listener so that when the delete link is clicked, the removeItemFromCart method is invoked.
@@ -18,39 +17,113 @@ function renderCart() {
   showCart();
 }
 
-// TODO: Remove all of the rows (tr) in the cart table (tbody)
+// Remove all of the rows (tr) in the cart table (tbody)
 function clearCart() {
-var old_tbody = document.getElementsByTagName('tbody');
-var new_tbody = document.createElement('tbody');
-populate_with_new_rows(new_tbody);
-old_tbody.parentNode.replaceChild(new_tbody, old_tbody);
+  var existingTableRows = document.querySelectorAll('#cart tbody tr');
+
+  for (var i = 0; i <= existingTableRows.length; i++) {
+    if (existingTableRows[i]) {
+      existingTableRows[i].remove();
+    }
+  }
+
 }
 
-// TODO: Fill in the <tr>'s under the <tbody> for each item in the cart
+// Fill in the <tr>'s under the <tbody> for each item in the cart
 function showCart() {
-  // TODO: Find the table body
-  var tbodyEl = document.getElementsByTagName('tbody');
-  // TODO: Iterate over the items in the cart
-  // TODO: Create a TR
-  var trEl = document.createElement('tr');
-  // TODO: Create a TD for the delete link, quantity,  and the item
-  var tdEl = document.createElement('td');
-  // TODO: Add the TR to the TBODY and each of the TD's to the TR
-  // table.appendChild(tbodyEl);
-  tbodyEl.appendChild(trEl);
-  trEl.appendChild(tdEl);
+
+  // Find the table body
+  var tableBody = document.querySelector('#cart tbody');
+
+  // Iterate over the items in the cart
+  for (var i in cart.items) {
+    // Create a TR
+    var tr = document.createElement('tr');
+
+    // Create a TD for the delete link, quantity,  and the item
+    var deleteTD = document.createElement('td');
+    deleteTD.textContent = 'x';
+    deleteTD.classList.add('deleter');
+    deleteTD.id = i;
+
+    var quantityTD = document.createElement('td');
+    quantityTD.textContent = cart.items[i].quantity;
+
+    var itemTD = document.createElement('td');
+    itemTD.textContent = cart.items[i].product;
+
+    var img = document.createElement('img');
+
+    // Render product images
+    for (var j = 0; j < Product.allProducts.length; j++) {
+      if (cart.items[i].product === Product.allProducts[j].name) {
+        img.src = Product.allProducts[j].filePath;
+      }
+    }
+
+    // Add the TR to the TBODY and each of the TD's to the TR
+    tableBody.appendChild(tr);
+
+    tr.appendChild(deleteTD);
+    tr.appendChild(quantityTD);
+    tr.appendChild(itemTD);
+    tr.appendChild(img);
+  }
+  var cardForm = document.createElement('form');
+  cardForm.setAttribute('id', 'cardForm');
+  document.body.appendChild(cardForm);
+
+  var enterName = document.createElement('input');
+  enterName.setAttribute('type', 'text');
+  enterName.setAttribute('placeholder', 'Enter Name');
+
+  var enterStreet = document.createElement('input');
+  enterStreet.setAttribute('type', 'text');
+  enterStreet.setAttribute('placeholder', 'Enter Street');
+
+  var enterState = document.createElement('input');
+  enterState.setAttribute('type', 'text');
+  enterState.setAttribute('placeholder', 'Enter State');
+
+  var enterZip = document.createElement('input');
+  enterZip.setAttribute('type', 'number');
+  enterZip.setAttribute('placeholder', 'Enter Zip');
+
+  var enterPhone = document.createElement('input');
+  enterPhone.setAttribute('type', 'number');
+  enterPhone.setAttribute('placeholder', 'Enter Phone');
+
+  var enterCreditCard = document.createElement('input');
+  enterCreditCard.setAttribute('type', 'number');
+  enterCreditCard.setAttribute('placeholder', 'Enter Credit Card');
+
+  var buttonProcessOrder = document.createElement('button');
+  buttonProcessOrder.setAttribute('class', 'btn');
+  buttonProcessOrder.textContent = 'Process Order';
+
+  cardForm.appendChild(enterName);
+
+  cardForm.appendChild(enterStreet);
+  cardForm.appendChild(enterState);
+  cardForm.appendChild(enterZip);
+  cardForm.appendChild(enterPhone);
+  
+  cardForm.appendChild(enterCreditCard);
+  cardForm.appendChild(buttonProcessOrder);
+
 }
 
 function removeItemFromCart(event) {
+  if (event.target.classList.contains('deleter')) {
+    // When a delete link is clicked, use cart.removeItem to remove the correct item
+    cart.removeItem(parseInt(event.target.id));
 
-  // TODO: When a delete link is clicked, use cart.removeItem to remove the correct item
-  
-  // TODO: Save the cart back to local storage
-  var items = JSON.stringify(Cart.items);
-  localStorage.setItem("cart", items);  
-  // TODO: Re-draw the cart table
-  showCart();
+    // Save the cart back to local storage
+    cart.saveToLocalStorage();
 
+    // Re-draw the cart table
+    renderCart();
+  }
 }
 
 // This will initialize the page and draw the cart on screen
